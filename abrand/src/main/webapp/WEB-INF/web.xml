@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd"
+	id="WebApp_ID" version="3.0">
+	<display-name>abrand</display-name>
+
+<!--  
+		스프링 Request/Response 경로 
+	1. 스프링 리스너: 스프링 리스너는 서블릿이 컨테이너(톰캣)가 켜질 때 가장 먼저 실행 되며 
+	    보통 rootPath , DB정보,로그저장위치 등  서블릿이 꺼질 때 까지  바뀌지 않는 정보들을 담습니다.
+	    
+	2. 필터: 필터는 Request 가 생길때마다 실행되어집니다.
+	    예를들어)  *.do 혹은 *.jsp 등으로 설정하면,  모든 *.do로 실행되어지는 url경로에 대해서 필터역할을 합니다.
+	    보통 CharSet , 또는 잘못된 접근 경로 등을 설정합니다.
+	    
+	3. DispatcherServlet ( Spring이 제공하는 서블릿)
+	    스프링은 자체 서블릿을 사용합니다. View 페이지나 Request로 넘어온 파라미터, 전달 값을 스프링 자체 서블릿에서 처리 한 후
+	    requestMapping된 경로로 파라미터를 보내줍니다. 
+	     
+ -->
+
+
+	<!-- Spring 설정파일 경로 -->
+	<context-param>
+		<param-name>contextConfigLocation</param-name>
+		<param-value>classpath:net/cr/abrand/conf/application-context.xml</param-value>
+	</context-param>
+
+	
+
+	<!-- 스프링 리스너: 톰켓 컨테이너가 시작되는 리스너 설정. 스프링에서 제공하는 리스너 사용 -->
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
+
+	
+	
+	<!-- 필터 선언 -->
+	<filter>
+		<filter-name>CharSetFilter</filter-name>
+		<filter-class>net.cr.abrand.filters.CharSetFilter</filter-class>
+	</filter>
+	<filter>
+		<filter-name>AuthFilter</filter-name>
+		<filter-class>net.cr.abrand.filters.AuthFilter</filter-class>
+	</filter>
+	<!-- 필터에 URL을 설정 -->
+	<filter-mapping>
+		<filter-name>CharSetFilter</filter-name>
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>AuthFilter</filter-name>
+		<url-pattern>*.do</url-pattern>
+	</filter-mapping>
+
+
+
+	<!-- Spring 서블릿 선언 -->
+	<servlet>
+		<servlet-name>dispatcher</servlet-name>
+		<servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+		<init-param>
+			<param-name>contextConfigLocation</param-name>
+			<param-value>/WEB-INF/dispatcher-servlet.xml</param-value>
+		</init-param>
+		<!-- DP서블릿이 실행되는 순위 설정 -->
+		<load-on-startup>99</load-on-startup>
+	</servlet>
+	<!-- Spring 서블릿에 URL을 설정 -->
+	<servlet-mapping>
+		<servlet-name>dispatcher</servlet-name>
+		<url-pattern>*.do</url-pattern>
+	</servlet-mapping>
+
+
+
+
+
+</web-app>
